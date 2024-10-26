@@ -10,8 +10,8 @@ resource "aws_vpc_security_group_egress_rule" "outgoing_any" {
   security_group_id = aws_security_group.terraform_ez_server_security.id
   from_port         = 0
   to_port           = 0
-  ip_protocol          = "-1"
-  cidr_ipv4       = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "incoming_ssh" {
@@ -19,5 +19,14 @@ resource "aws_vpc_security_group_ingress_rule" "incoming_ssh" {
   from_port         = 22
   to_port           = 22
   ip_protocol       = "tcp"
-  cidr_ipv4       = "0.0.0.0/0"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "incoming_user_specified" {
+  for_each = var.open_ports
+  security_group_id = aws_security_group.terraform_ez_server_security.id
+  from_port         = tonumber(each.key)
+  to_port           = tonumber(each.key)
+  ip_protocol       = each.value
+  cidr_ipv4         = "0.0.0.0/0"
 }
