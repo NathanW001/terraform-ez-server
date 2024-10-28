@@ -58,7 +58,7 @@ variable "public_key" {
 
 variable "open_ports" {
   type = map(string)
-  default = null
+  default = {}
 
   validation {
     condition = (alltrue([for value in values(var.open_ports) : value == "tcp" || value == "udp" || value == "-1"]) &&
@@ -67,5 +67,15 @@ variable "open_ports" {
                                                       tonumber(key) <= 65535 &&
                                                       tonumber(key) != 22)])) // explicitly disallow ssh port, it will already be open
     error_message = "One or more user defined inbound ports is malformed, please ensure that they are all correct. Please don't use port 22 if you have, SSH is automatically configured"
+  }
+}
+
+variable "custom_setup_script" {
+  type = string
+  default = null
+
+  validation {
+    condition = var.custom_setup_script == null ? true : fileexists(var.custom_setup_script)
+    error_message = "File does not exist"
   }
 }
